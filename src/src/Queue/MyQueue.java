@@ -14,6 +14,7 @@
 package Queue;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class MyQueue<T> {
     private Node<T> head;
@@ -22,11 +23,11 @@ public class MyQueue<T> {
 
     static class Node<T> {
         T data;
-        Node<T> next;
+        Node<T> prev;
 
         public Node(T data) {
             this.data = data;
-            this.next = null;
+            this.prev = null;
         }
     }
 
@@ -40,30 +41,22 @@ public class MyQueue<T> {
             throw new NullPointerException();
         }
 
-        if (head == null) {
+        if (tail == null) {
             head = tail = new_node;
-            new_node.next = null;
         } else {
-            tail.next = new_node;
+            new_node.prev = tail;
             tail = new_node;
         }
-        tail.next = null;
         size++;
     }
 
     public boolean clear() {
         if (isEmpty()) {
-            return true;
+            throw new NoSuchElementException();
         }
-        Node<T> current = head;
-        int counter = 0;
-        while (counter < size ) {
-            head.data = null;
-            head.next = current;
-            counter++;
-        }
+        head = tail = null;
         size = 0;
-        return isEmpty();
+        return true;
     }
 
     public int size() {
@@ -71,31 +64,30 @@ public class MyQueue<T> {
     }
 
     public T peek(){
-        T data = head.data;
         if(!isEmpty()) {
-            return data;
+            return head.data;
         } else return null;
     }
 
-    public T poll() {
-        T data = head.data;
-        Node<T> current = head;
-        if(!isEmpty()) {
-            head.data = null;
-            head.next = current;
-        } else return null;
-        size--;
-        return data;
-    }
+//    public T poll() {
+//        T data = head.data;
+//        Node<T> current = head;
+//        if(!isEmpty()) {
+//            head.data = null;
+//            head.next = current;
+//        } else return null;
+//        size--;
+//        return data;
+//    }
 
     public String toString() {
         Object[] array = new Object[size];
-        Node<T> current = head;
+        Node<T> current = tail;
 
         int index = 0;
         while (current != null) {
             array[index] = current.data;
-            current = current.next;
+            current = current.prev;
             index++;
         }
         return Arrays.toString(array);
