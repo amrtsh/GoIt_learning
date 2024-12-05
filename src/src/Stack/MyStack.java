@@ -1,24 +1,22 @@
 package Stack;
 
-//Написати свій клас MyStack як аналог класу Stack, який працює за принципом LIFO (last-in-first-out).
+//Написати свій клас MyStack як аналог класу Stack,
+// який працює за принципом LIFO (last-in-first-out).
 //
-//Можна робити за допомогою Node або використати масив.
+//        Можна робити за допомогою Node або використати масив.
 //
-//Методи
+//        Методи
 //
-//push(Object value) додає елемент в кінець
-//remove(int index) видаляє елемент за індексом
-//clear() очищає колекцію
-//size() повертає розмір колекції
-//peek() повертає перший елемент стеку
-//pop() повертає перший елемент стеку та видаляє його з колекції
+//        push(Object value) додає елемент в кінець
+//        remove(int index) видаляє елемент за індексом
+//        clear() очищає колекцію
+//        size() повертає розмір колекції
+//        peek() повертає перший елемент стеку
+//        pop() повертає перший елемент стеку та видаляє його з колекції
 
-
-import java.util.Arrays;
 
 public class MyStack<T> {
     private Node<T> head;
-    private Node<T> tail;
     private int size = 0;
 
     static class Node<T> {
@@ -42,11 +40,15 @@ public class MyStack<T> {
         }
 
         if (head == null) {
-            head = tail = new_node;
+            head = new_node;
             new_node.next = null;
         } else {
-            new_node.next = head;
-            head = new_node;
+            Node<T> current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = new_node;
+            current.next.next = null;
         }
         size++;
     }
@@ -57,24 +59,28 @@ public class MyStack<T> {
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException();
         }
-        while (counter != index) {
+        else if (index == 0) { // Removing the head
+            head = head.next; // Update head to the next node
+        }
+
+        for (int i = 0; i < index - 1; i++) {
             current = current.next;
-            counter++;
         }
         current.next = current.next.next;
-        size--;
+
+    size--;
     }
 
 
     public void clear() {
         if (isEmpty()) {
-            return;
+            throw new IllegalStateException("Stack already empty!");
         }
         Node<T> current = head;
         int counter = 0;
         while (counter < size) {
-            head.data = null;
-            head.next = current;
+            current.data = null;
+            current = current.next;
             counter++;
         }
         size = 0;
@@ -85,33 +91,40 @@ public class MyStack<T> {
     }
 
     public T peek(){
-        T data = head.data;
         if(!isEmpty()) {
-            return data;
+            return head.data;
         } else return null;
     }
 
     public T pop() {
+        if (isEmpty()) {
+            throw new IllegalStateException("Stack is empty!");
+        }
         T data = head.data;
-        Node<T> current = head;
-        if(!isEmpty()) {
-            head.data = null;
-            head.next = current;
-        } else return null;
+        remove(0);
         size--;
         return data;
     }
 
+    @Override
     public String toString() {
-        Object[] array = new Object[size];
+        if (isEmpty()) {
+            return "Stack is empty!";
+        }
+
+        StringBuilder sb = new StringBuilder();
         Node<T> current = head;
 
-        int index = 0;
+        sb.append("Stack: ");
         while (current != null) {
-            array[index] = current.data;
+            sb.append(current.data);
+            if (current.next != null) {
+                sb.append(" -> ");
+            }
             current = current.next;
-            index++;
         }
-        return Arrays.toString(array);
+
+        return sb.toString();
     }
+
 }
